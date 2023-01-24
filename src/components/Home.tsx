@@ -1,15 +1,17 @@
 import React, {MouseEvent, useState, FormEventHandler} from 'react';
 import {useQuery} from 'react-query';
-import {User, Role} from '../types';
+import type {User} from '../types/types';
+import {Role} from '../utils/constants';
 import {AiOutlineCloudDownload, AiOutlinePlus} from 'react-icons/ai';
 import Table from './Table';
-import {AiOutlineArrowLeft, AiOutlineArrowRight} from 'react-icons/ai';
 import Modal from './Modal';
 import useApi from '../hooks/useApi';
 import {CSVLink} from 'react-csv';
+import Pagination from './Pagination';
+import DeleteModal from './DeleteModal';
 
 const Home = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<Array<User>>([]);
   const [activePage, setActivePage] = useState<number>(1);
   const [currentEditUser, setCurrentEditUser] = useState<number | null>(null);
   const [deleteModal, setDeleteModal] = useState<string | null>(null);
@@ -26,15 +28,18 @@ const Home = () => {
       refetchOnWindowFocus: false,
     }
   );
+
   const handlePage = (ev: MouseEvent<HTMLElement>, ind: number) => {
     setActivePage(ind);
   };
 
-  const handleDelete = (index: string) => {
-    handleUserDelete(index).then(() => {
-      refetch();
-      setDeleteModal(null);
-    });
+  const handleDelete = (index: string | null) => {
+    if (index) {
+      handleUserDelete(index).then(() => {
+        refetch();
+        setDeleteModal(null);
+      });
+    }
   };
 
   const handleUserSort = (cb: any) => {
@@ -79,7 +84,7 @@ const Home = () => {
   };
 
   return (
-    <div className="container border p-5 rounded-md shadow">
+    <div className="w-full border p-5 rounded-md shadow">
       <div className="flex flex-row">
         <div className="flex flex-col">
           <div className="flex flex-row py-1">
@@ -120,48 +125,11 @@ const Home = () => {
         handleUserSort={handleUserSort}
         setDeleteModal={setDeleteModal}
       />
-      <div className="flex flex-row justify-between">
-        <button
-          className="flex items-center border bg-white-500 p-2 rounded-md text-sm font-medium disabled:opacity-50"
-          onClick={ev => handlePage(ev, activePage - 1)}
-          disabled={activePage === 1}
-        >
-          <AiOutlineArrowLeft />
-          <div className="pl-2">Previous</div>
-        </button>
-        <div className="flex">
-          {users &&
-            [
-              ...Array(
-                Math.trunc((users?.length as number) / 10) +
-                  (users?.length % 10 !== 0 ? 1 : 0)
-              ).keys(),
-            ].map(num => (
-              <button
-                key={num}
-                className={
-                  'mx-1 px-3 border items-center flex rounded-md ' +
-                  (activePage === num + 1
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white-500 text-slate-500')
-                }
-                onClick={ev => handlePage(ev, num + 1)}
-              >
-                {num + 1}
-              </button>
-            ))}
-        </div>
-        <button
-          className="flex items-center border bg-white-500 p-2 rounded-md text-sm font-medium disabled:opacity-50"
-          onClick={ev => handlePage(ev, activePage + 1)}
-          disabled={
-            activePage - 1 >= Math.trunc((users?.length as number) / 10)
-          }
-        >
-          <div className="pr-2">Next</div>
-          <AiOutlineArrowRight />
-        </button>
-      </div>
+      <Pagination
+        activePage={activePage}
+        handlePage={handlePage}
+        users={users}
+      />
       {currentEditUser !== null &&
       (currentEditUser >= 0 || currentEditUser === -1) ? (
         <Modal
@@ -173,31 +141,11 @@ const Home = () => {
         />
       ) : null}
       {deleteModal ? (
-        <div>
-          <div className="fixed top-0 left-0 w-full h-full bg-black opacity-50 z-10"></div>
-          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-md shadow-lg z-20">
-            <div className="p-4">
-              <div className="text-lg font-bold">Delete User</div>
-              <div className="text-sm text-slate-500">
-                Are you sure you want to delete this user?
-                <div className="flex flex-row-reverse mt-4 justify-between">
-                  <button
-                    className="bg-red-500 text-white px-3 py-1 rounded-md"
-                    onClick={() => handleDelete(deleteModal)}
-                  >
-                    Delete
-                  </button>
-                  <button
-                    className="bg-white-500 text-slate-500 px-3 py-1 rounded-md"
-                    onClick={() => setDeleteModal(null)}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <DeleteModal
+          handleDelete={handleDelete}
+          setDeleteModal={setDeleteModal}
+          deleteModal={deleteModal}
+        />
       ) : null}
     </div>
   );

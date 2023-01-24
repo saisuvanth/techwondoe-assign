@@ -10,9 +10,12 @@
       "dom"
     ]
   },
+  "typeRoots": [
+    "src/types/"
+  ],
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
     "test/**/*.ts"
-  ]
+  ],
 }

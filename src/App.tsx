@@ -13,9 +13,9 @@ function App() {
       <div className="flex py-8 w-full">
         {headers.map((head, ind) => (
           <div key={ind}>
-            <button
+            <div
               className={
-                'border bg-white-500 p-1 px-2 shadow ' +
+                'border bg-white-500 p-1 px-2 shadow hover:cursor-pointer ' +
                 (ind === 0
                   ? 'rounded-l-md'
                   : ind === headers.length - 1
@@ -24,7 +24,7 @@ function App() {
               }
             >
               {head}
-            </button>
+            </div>
           </div>
         ))}
       </div>

@@ -1,51 +1,15 @@
-import React, {FC, SetStateAction} from 'react';
-import {User} from '../types';
+import React, {FC} from 'react';
+import type {User, TableProps} from '../types/types';
 import {
   AiOutlineDelete,
   AiOutlineEdit,
   AiOutlineArrowDown,
   AiOutlineArrowUp,
 } from 'react-icons/ai';
-import {Dispatch} from 'react';
+import {getMonth, formatTime, sortTable} from '../utils';
 import classNames from 'classnames';
-
-const getMonth = (month: number) => {
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  return months[month];
-};
-
-const formatTime = (date: Date) => {
-  let hours = date.getHours();
-  const minutes = date.getMinutes();
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  hours = hours % 12;
-  hours = hours ? hours : 12; // the hour '0' should be '12'
-  const strTime =
-    hours + ':' + (minutes < 10 ? '0' + minutes : minutes) + ' ' + ampm;
-  return strTime;
-};
-
-interface TableProps {
-  users: User[];
-  loading: boolean;
-  error: unknown;
-  currentEdit: Dispatch<SetStateAction<number | null>>;
-  handleUserSort: (cb: any) => void;
-  setDeleteModal: Dispatch<SetStateAction<string | null>>;
-}
+import Spinner from './Spinner';
+import {SortOrder, tableHeader} from '../utils/constants';
 
 const Table: FC<TableProps> = ({
   users,
@@ -55,55 +19,27 @@ const Table: FC<TableProps> = ({
   handleUserSort,
   setDeleteModal,
 }) => {
-  const [sort, setSort] = React.useState<string[]>([
-    'asc',
-    'asc',
-    'asc',
-    'asc',
+  const [sort, setSort] = React.useState<SortOrder[]>([
+    SortOrder.ASC,
+    SortOrder.ASC,
+    SortOrder.ASC,
+    SortOrder.ASC,
   ]);
+
   if (loading) {
-    return <div>Loading</div>;
+    return <Spinner />;
   }
 
   if (error) {
-    return <div>Error</div>;
+    return <div className="flex h-32 justify-content items-center">Error</div>;
   }
 
   const handleSort = (ind: number) => {
     const newSort = [...sort];
-    console.log(ind);
-    newSort[ind] = newSort[ind] === 'asc' ? 'desc' : 'asc';
+    newSort[ind] =
+      newSort[ind] === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
     setSort(newSort);
-    handleUserSort((a: User, b: User) => {
-      if (newSort[ind] === 'asc') {
-        if (ind === 0) {
-          return a.name.localeCompare(b.name);
-        }
-        if (ind === 1) {
-          return a.status?.localeCompare(b.status as string);
-        }
-        if (ind === 2) {
-          return a.role?.localeCompare(b.role?.toString() as string);
-        }
-        if (ind === 3) {
-          return a.lastLogin.getTime() - b.lastLogin.getTime();
-        }
-      } else {
-        if (ind === 0) {
-          return b.name.localeCompare(a.name);
-        }
-        if (ind === 1) {
-          return b.status?.localeCompare(a.status as string);
-        }
-        if (ind === 2) {
-          return b.role?.localeCompare(a.role?.toString() as string);
-        }
-        if (ind === 3) {
-          return b.lastLogin.getTime() - a.lastLogin.getTime();
-        }
-      }
-      return 0;
-    });
+    handleUserSort((a: User, b: User) => sortTable(a, b, newSort, ind));
   };
 
   return (
@@ -111,66 +47,23 @@ const Table: FC<TableProps> = ({
       <table className="table">
         <thead>
           <tr>
-            <th scope="col">
-              <div className="flex justify-between">
-                Name
-                <button
-                  className="p-1 border rounded-lg"
-                  onClick={() => handleSort(0)}
-                >
-                  {sort[0] === 'asc' ? (
-                    <AiOutlineArrowDown />
-                  ) : (
-                    <AiOutlineArrowUp />
-                  )}
-                </button>
-              </div>
-            </th>
-            <th scope="col">
-              <div className="flex justify-between">
-                Status
-                <button
-                  className="p-1 border rounded-lg"
-                  onClick={() => handleSort(1)}
-                >
-                  {sort[1] === 'asc' ? (
-                    <AiOutlineArrowDown />
-                  ) : (
-                    <AiOutlineArrowUp />
-                  )}
-                </button>
-              </div>
-            </th>
-            <th scope="col">
-              <div className="flex justify-between">
-                Role
-                <button
-                  className="p-1 border rounded-lg"
-                  onClick={() => handleSort(2)}
-                >
-                  {sort[2] === 'asc' ? (
-                    <AiOutlineArrowDown />
-                  ) : (
-                    <AiOutlineArrowUp />
-                  )}
-                </button>
-              </div>
-            </th>
-            <th scope="col">
-              <div className="flex justify-between">
-                Last Login
-                <button
-                  className="p-1 border rounded-lg"
-                  onClick={() => handleSort(3)}
-                >
-                  {sort[3] === 'asc' ? (
-                    <AiOutlineArrowDown />
-                  ) : (
-                    <AiOutlineArrowUp />
-                  )}
-                </button>
-              </div>
-            </th>
+            {tableHeader.map((tble, index) => (
+              <th scope="col" key={index}>
+                <div className="flex justify-between">
+                  {tble}
+                  <button
+                    className="p-1 border rounded-lg"
+                    onClick={() => handleSort(index)}
+                  >
+                    {sort[index] === SortOrder.ASC ? (
+                      <AiOutlineArrowDown />
+                    ) : (
+                      <AiOutlineArrowUp />
+                    )}
+                  </button>
+                </div>
+              </th>
+            ))}
             <th scope="col">Actions</th>
           </tr>
         </thead>

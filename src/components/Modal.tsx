@@ -1,17 +1,8 @@
-import React, {SetStateAction} from 'react';
+import React, {Fragment} from 'react';
 import {FC} from 'react';
-import {FormEventHandler} from 'react';
-import {Dispatch} from 'react';
 import {AiOutlineClose} from 'react-icons/ai';
-import {User} from '../types';
+import {ModalProps} from '../types/types';
 
-interface ModalProps {
-  activePage: number;
-  setCurrentEditUser: Dispatch<SetStateAction<number | null>>;
-  currentEditUser: number;
-  users: User[];
-  handleAdd: FormEventHandler<HTMLFormElement>;
-}
 const Modal: FC<ModalProps> = ({
   setCurrentEditUser,
   currentEditUser,
@@ -20,7 +11,7 @@ const Modal: FC<ModalProps> = ({
   activePage,
 }) => {
   return (
-    <>
+    <Fragment>
       <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
         <div className="relative my-6 w-2/4">
           <div className="bg-white p-3 rounded-md">
@@ -117,7 +108,7 @@ const Modal: FC<ModalProps> = ({
         </div>
       </div>
       <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
-    </>
+    </Fragment>
   );
 };
 

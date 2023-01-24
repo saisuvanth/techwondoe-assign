@@ -2,7 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .page_button {
+    @apply flex items-center border p-2 rounded-md text-sm font-medium
+  }
 
+  .page_button:disabled {
+    @apply opacity-50 cursor-not-allowed
+  }
+
+  .page_button:hover {
+    @apply bg-blue-500 text-white
+  }
+}
 
 body {
   margin: 0;
