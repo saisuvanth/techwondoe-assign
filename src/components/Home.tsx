@@ -99,7 +99,7 @@ const Home = () => {
         </div>
         <div className="flex flex-1 justify-end items-center space-x-3">
           <button className="h-fit border bg-white-500 p-2 rounded-md text-sm font-medium">
-            <CSVLink data={users}>
+            <CSVLink data={users} filename={'data.csv'}>
               <span className="flex items-center">
                 <AiOutlineCloudDownload size={20} className="mr-2" />
                 Download CSV
