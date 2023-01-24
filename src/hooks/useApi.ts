@@ -36,7 +36,7 @@ const useApi = () => {
       method: 'DELETE',
       headers: headers,
     });
-    const json = await res.json();
+    await res.json();
   };
 
   const handleUserAdd = async (user: User) => {
@@ -45,7 +45,7 @@ const useApi = () => {
       headers: headers,
       body: JSON.stringify(user),
     });
-    const json = await res.json();
+    await res.json();
   };
 
   const handleUserUpdate = async (user: User) => {
@@ -54,7 +54,7 @@ const useApi = () => {
       headers: headers,
       body: JSON.stringify(user),
     });
-    const json = await res.json();
+    await res.json();
   };
 
   return {fetchUsers, handleUserDelete, handleUserAdd, handleUserUpdate};
