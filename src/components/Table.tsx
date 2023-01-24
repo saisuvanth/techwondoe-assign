@@ -49,10 +49,10 @@ const Table: FC<TableProps> = ({
           <tr>
             {tableHeader.map((tble, index) => (
               <th scope="col" key={index}>
-                <div className="flex justify-between">
+                <div className="flex justify-start">
                   {tble}
                   <button
-                    className="p-1 border rounded-lg"
+                    className="p-1 ml-5 border-0 rounded-md shadow-sm text-gray-600 "
                     onClick={() => handleSort(index)}
                   >
                     {sort[index] === SortOrder.ASC ? (
